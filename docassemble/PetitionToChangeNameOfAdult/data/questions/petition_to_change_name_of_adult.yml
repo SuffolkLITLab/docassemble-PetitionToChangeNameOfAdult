@@ -1,0 +1,565 @@
+comment: |
+  The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
+metadata:
+  title: |
+    Petition to Change Name of Adult
+  short title: |
+    Name Change Petition
+---
+comment: |
+  This section is used by MAVirtualCourts to control how some of the questions work.
+mandatory: True
+code: |
+  interview_metadata # make sure we initialize the object
+  if not defined("interview_metadata['petition_to_change_name_of_adult']"):
+    interview_metadata.initializeObject('petition_to_change_name_of_adult')
+  interview_metadata['petition_to_change_name_of_adult'].update({
+    'title': 'Petition to Change Name of Adult',
+    'short title': 'Name Change Petition',
+    'description': 'Request to change the name of an adult',
+    'original_form': 'https://www.mass.gov/doc/petition-to-change-name-of-adult-cjp-27/download',
+    'allowed courts': [
+      'Boston Municipal Court',
+      'District Court',
+      'Probate and Family Court',
+      'Superior Court',
+    ],
+    'categories': [
+      'Family Law',
+    ],
+    'logic block variable': 'petition_to_change_name_of_adult',
+    'attachment block variable': 'petition_to_change_name_of_adult_attachment',
+    'typical role': 'plaintiff',
+  })
+---
+include:
+  - docassemble.MAVirtualCourt:basic-questions.yml
+---
+features:
+  navigation: True
+---
+sections:
+  - review_petition_to_change_name_of_adult: Review your answers
+---
+id: interview_order_petition_to_change_name_of_adult
+code: |
+  # This is a placeholder to control logic flow in this interview
+
+  basic_questions_intro_screen 
+  petition_to_change_name_of_adult_intro
+  # Set the allowed courts for this interview
+  allowed_courts = interview_metadata["petition_to_change_name_of_adult"]["allowed courts"]
+  nav.set_section('review_petition_to_change_name_of_adult')
+  user_role = 'plaintiff'
+  user_mail_address_street
+  user_prior_name_change_yes
+  user_prior_name_change1_from
+  user_prior_name_change2_from
+  user_prior_name_change3_from
+  user_prior_name_change4_from
+  user_prior_name_change5_from
+  user_prior_name_change6_from
+  request_return_of_docs
+  user_name_middle_new
+  user_name_change_reason
+  interpreter_language
+  attorney_bbo
+  docket_numbers
+  users[0].name.middle
+  users[0].name.last
+  courts[0].division
+  users[0].name.first
+  users[0].address.address
+  users[0].address.unit
+  users[0].address.city
+  users[0].address.state
+  users[0].address.zip
+  users[0].phone_number
+  users[0].email
+  signature_date
+  str(users[0])
+  str(attorneys[0])
+  attorneys[0].address.address
+  attorneys[0].address.unit
+  attorneys[0].address.state
+  attorneys[0].address.city
+  attorneys[0].address.zip
+  attorneys[0].phone_number
+  attorneys[0].email
+  petition_to_change_name_of_adult_preview_question # Pre-canned preview screen
+  basic_questions_signature_flow
+  users[0].signature
+  attorneys[0].signature
+  petition_to_change_name_of_adult = True
+---
+comment: |
+  This question is used to introduce your interview. Please customize
+id: Petition to Change Name of Adult
+continue button field: petition_to_change_name_of_adult_intro
+question: |
+  Petition to Change Name of Adult
+subquestion: |
+  Request to change the name of an adult
+---
+id: Placeholder preview screen
+continue button field: petition_to_change_name_of_adult_preview_question
+question: |
+  Placeholder preview screen
+subquestion: |
+  Here is a preview of the form you'll sign on the next page. 
+  
+   ${petition_to_change_name_of_adult_attachment['preview']}
+---
+id: What is your mailing address?
+question: |
+  What is your mailing address?
+subquestion: |
+  Placeholder text
+fields:
+  - 'Street Address': user_mail_address_street
+  - 'City': user_mail_address_city
+  - 'Unit': user_mail_address_street2
+  - 'Zip': user_mail_address_zip
+  - 'State': user_mail_address_state
+---
+id: Have you changed your name before?
+question: |
+  Have you changed your name before?
+subquestion: |
+  Placeholder text
+fields:
+  - 'Have you changed your name before? (yes)': user_prior_name_change_yes
+    datatype: yesno
+  - 'Have you changed your name before? (no)': user_prior_name_change_no
+    datatype: yesno
+---
+id: What was your first name change?
+question: |
+  What was your first name change?
+subquestion: |
+  Placeholder text
+fields:
+  - 'Birth name': user_prior_name_change1_from
+  - 'To (1)': user_prior_name_change1_to
+  - 'Reason (1)': user_prior_name_change1_reason
+---
+id: What was your second name change?
+question: |
+  What was your second name change?
+subquestion: |
+  Placeholder text
+fields:
+  - 'From (2)': user_prior_name_change2_from
+  - 'To (2)': user_prior_name_change2_to
+  - 'Reason (2)': user_prior_name_change2_reason
+---
+id: What was your third name change?
+question: |
+  What was your third name change?
+subquestion: |
+  Placeholder text
+fields:
+  - 'From (3)': user_prior_name_change3_from
+  - 'To (3)': user_prior_name_change3_to
+  - 'Reason (3)': user_prior_name_change3_reason
+---
+id: What was your fourth name change?
+question: |
+  What was your fourth name change?
+subquestion: |
+  Placeholder text
+fields:
+  - 'From (4)': user_prior_name_change4_from
+  - 'To (4)': user_prior_name_change4_to
+  - 'Reason (4)': user_prior_name_change4_reason
+---
+id: What was your fifth name change?
+question: |
+  What was your fifth name change?
+subquestion: |
+  Placeholder text
+fields:
+  - 'From (5)': user_prior_name_change5_from
+  - 'To (5)': user_prior_name_change5_to
+  - 'Reason (5)': user_prior_name_change5_reason
+---
+id: What was your sixth name change?
+question: |
+  What was your sixth name change?
+subquestion: |
+  Placeholder text
+fields:
+  - 'From (6)': user_prior_name_change6_from
+  - 'To (6)': user_prior_name_change6_to
+  - 'Reason (6)': user_prior_name_change6_reason
+---
+id: Do you want the court to return your documents to you?
+question: |
+  Do you want the court to return your documents to you?
+subquestion: |
+  Placeholder text
+yesno: request_return_of_docs
+---
+id: What is your new name?
+question: |
+  What is your new name?
+subquestion: |
+  Placeholder text
+fields:
+  - 'New middle name': user_name_middle_new
+  - 'New first name': user_name_first_new
+  - 'New last name': user_name_last_new
+---
+id: Why do you want to change your name
+question: |
+  Why do you want to change your name
+subquestion: |
+  Placeholder text
+fields:
+  - 'Why do you want to change your name?': user_name_change_reason
+---
+id: Delete
+question: |
+  Delete
+subquestion: |
+  Placeholder text
+fields:
+  - 'Interpreter language': interpreter_language
+  - 'Would you like an interpreter?': request_interpreter
+    datatype: yesno
+---
+id: What is the attorney's BBO number?
+question: |
+  What is the attorney's BBO number?
+subquestion: |
+  Placeholder text
+fields:
+  - 'Attorney BBO': attorney_bbo
+---
+progress: 100
+mandatory: True
+id: Placeholder download screen
+question: |
+  Placeholder download screen
+subquestion: |
+  Placeholder
+  
+  ### Next steps
+  
+  1. Step 1
+  1. Step 2
+  
+  Below is a preview of your form.
+  
+  ${petition_to_change_name_of_adult_attachment['final'] }
+need: petition_to_change_name_of_adult
+attachment code: petition_to_change_name_of_adult_attachment['final']
+---
+objects:
+  - petition_to_change_name_of_adult_attachment: DADict
+---
+attachment:
+    variable name: petition_to_change_name_of_adult_attachment[i]
+    name: Name Change Petition
+    filename: Name-Change-Petition
+    skip undefined: True
+    pdf template file: petition_to_change_name_of_adult.pdf
+    fields: 
+      - "docket_number": ${ docket_numbers }
+      - "user_name_middle": ${ users[0].name.middle }
+      - "user_name_last": ${ users[0].name.last }
+      - "court_division": ${ courts[0].division }
+      - "user_name_first": ${ users[0].name.first }
+      - "user_name_first__2": ${ users[0].name.first }
+      - "user_name_middle__2": ${ users[0].name.middle }
+      - "user_name_last__2": ${ users[0].name.last }
+      - "user_address_street": ${ users[0].address.address }
+      - "user_address_street2": ${ users[0].address.unit }
+      - "user_address_city": ${ users[0].address.city }
+      - "user_address_state": ${ users[0].address.state }
+      - "user_address_zip": ${ users[0].address.zip }
+      - "user_phone": ${ users[0].phone_number }
+      - "user_email": ${ users[0].email }
+      - "signature_date": ${ signature_date }
+      # If it is a signature, test which file version we're expecting. leave it empty unless it's the final attachment version
+      - "user_signature": ${ users[0].signature if i == 'final' else '' }
+      - "user_name": ${ str(users[0]) }
+      # If it is a signature, test which file version we're expecting. leave it empty unless it's the final attachment version
+      - "attorney_signature": ${ attorneys[0].signature if i == 'final' else '' }
+      - "attorney_name": ${ str(attorneys[0]) }
+      - "attorney_address_street": ${ attorneys[0].address.address }
+      - "attorney_address_street2": ${ attorneys[0].address.unit }
+      - "attorney_address_state": ${ attorneys[0].address.state }
+      - "attorney_address_city": ${ attorneys[0].address.city }
+      - "attorney_address_zip": ${ attorneys[0].address.zip }
+      - "attorney_phone": ${ attorneys[0].phone_number }
+      - "attorney_email": ${ attorneys[0].email }
+      - "user_mail_address_street": ${ user_mail_address_street }
+      - "user_mail_address_city": ${ user_mail_address_city }
+      - "user_mail_address_street2": ${ user_mail_address_street2 }
+      - "user_mail_address_zip": ${ user_mail_address_zip }
+      - "user_mail_address_state": ${ user_mail_address_state }
+      - "user_prior_name_change_yes": ${ user_prior_name_change_yes }
+      - "user_prior_name_change_no": ${ user_prior_name_change_no }
+      - "user_prior_name_change1_from": ${ user_prior_name_change1_from }
+      - "user_prior_name_change1_to": ${ user_prior_name_change1_to }
+      - "user_prior_name_change1_reason": ${ user_prior_name_change1_reason }
+      - "user_prior_name_change2_from": ${ user_prior_name_change2_from }
+      - "user_prior_name_change2_to": ${ user_prior_name_change2_to }
+      - "user_prior_name_change2_reason": ${ user_prior_name_change2_reason }
+      - "user_prior_name_change3_from": ${ user_prior_name_change3_from }
+      - "user_prior_name_change3_to": ${ user_prior_name_change3_to }
+      - "user_prior_name_change3_reason": ${ user_prior_name_change3_reason }
+      - "request_return_of_docs": ${ request_return_of_docs }
+      - "user_name_middle_new": ${ user_name_middle_new }
+      - "user_name_first_new": ${ user_name_first_new }
+      - "user_name_last_new": ${ user_name_last_new }
+      - "user_name_change_reason": ${ user_name_change_reason }
+      - "interpreter_language": ${ interpreter_language }
+      - "request_interpreter": ${ request_interpreter }
+      - "attorney_bbo": ${ attorney_bbo }
+      - "user_prior_name_change4_from": ${ user_prior_name_change4_from }
+      - "user_prior_name_change4_to": ${ user_prior_name_change4_to }
+      - "user_prior_name_change4_reason": ${ user_prior_name_change4_reason }
+      - "user_prior_name_change5_from": ${ user_prior_name_change5_from }
+      - "user_prior_name_change5_to": ${ user_prior_name_change5_to }
+      - "user_prior_name_change5_reason": ${ user_prior_name_change5_reason }
+      - "user_prior_name_change6_from": ${ user_prior_name_change6_from }
+      - "user_prior_name_change6_to": ${ user_prior_name_change6_to }
+      - "user_prior_name_change6_reason": ${ user_prior_name_change6_reason }
+---
+id: petition_to_change_name_of_adult review screen
+event: review_petition_to_change_name_of_adult
+question: |
+  Placeholder Review Screen
+subquestion: |
+  Edit your answers below
+review: 
+  - Edit: user_mail_address_street
+    button: |
+      Street Address:
+      ${ user_mail_address_street }
+  - Edit: user_mail_address_city
+    button: |
+      City:
+      ${ user_mail_address_city }
+  - Edit: user_mail_address_street2
+    button: |
+      Unit:
+      ${ user_mail_address_street2 }
+  - Edit: user_mail_address_zip
+    button: |
+      Zip:
+      ${ user_mail_address_zip }
+  - Edit: user_mail_address_state
+    button: |
+      State:
+      ${ user_mail_address_state }
+  - Edit: user_prior_name_change_yes
+    button: |
+      Have you changed your name before? (yes):
+      ${ word(yesno(user_prior_name_change_yes)) }
+  - Edit: user_prior_name_change_no
+    button: |
+      Have you changed your name before? (no):
+      ${ word(yesno(user_prior_name_change_no)) }
+  - Edit: user_prior_name_change1_from
+    button: |
+      Birth name:
+      ${ user_prior_name_change1_from }
+  - Edit: user_prior_name_change1_to
+    button: |
+      To (1):
+      ${ user_prior_name_change1_to }
+  - Edit: user_prior_name_change1_reason
+    button: |
+      Reason (1):
+      ${ user_prior_name_change1_reason }
+  - Edit: user_prior_name_change2_from
+    button: |
+      From (2):
+      ${ user_prior_name_change2_from }
+  - Edit: user_prior_name_change2_to
+    button: |
+      To (2):
+      ${ user_prior_name_change2_to }
+  - Edit: user_prior_name_change2_reason
+    button: |
+      Reason (2):
+      ${ user_prior_name_change2_reason }
+  - Edit: user_prior_name_change3_from
+    button: |
+      From (3):
+      ${ user_prior_name_change3_from }
+  - Edit: user_prior_name_change3_to
+    button: |
+      To (3):
+      ${ user_prior_name_change3_to }
+  - Edit: user_prior_name_change3_reason
+    button: |
+      Reason (3):
+      ${ user_prior_name_change3_reason }
+  - Edit: request_return_of_docs
+    button: |
+      Do you want the court to return your documents to you:
+      ${ word(yesno(request_return_of_docs)) }
+  - Edit: user_name_middle_new
+    button: |
+      New middle name:
+      ${ user_name_middle_new }
+  - Edit: user_name_first_new
+    button: |
+      New first name:
+      ${ user_name_first_new }
+  - Edit: user_name_last_new
+    button: |
+      New last name:
+      ${ user_name_last_new }
+  - Edit: user_name_change_reason
+    button: |
+      Why do you want to change your name?:
+      ${ user_name_change_reason }
+  - Edit: interpreter_language
+    button: |
+      Interpreter language:
+      ${ interpreter_language }
+  - Edit: request_interpreter
+    button: |
+      Would you like an interpreter?:
+      ${ word(yesno(request_interpreter)) }
+  - Edit: attorney_bbo
+    button: |
+      Attorney BBO:
+      ${ attorney_bbo }
+  - Edit: user_prior_name_change4_from
+    button: |
+      From (4):
+      ${ user_prior_name_change4_from }
+  - Edit: user_prior_name_change4_to
+    button: |
+      To (4):
+      ${ user_prior_name_change4_to }
+  - Edit: user_prior_name_change4_reason
+    button: |
+      Reason (4):
+      ${ user_prior_name_change4_reason }
+  - Edit: user_prior_name_change5_from
+    button: |
+      From (5):
+      ${ user_prior_name_change5_from }
+  - Edit: user_prior_name_change5_to
+    button: |
+      To (5):
+      ${ user_prior_name_change5_to }
+  - Edit: user_prior_name_change5_reason
+    button: |
+      Reason (5):
+      ${ user_prior_name_change5_reason }
+  - Edit: user_prior_name_change6_from
+    button: |
+      From (6):
+      ${ user_prior_name_change6_from }
+  - Edit: user_prior_name_change6_to
+    button: |
+      To (6):
+      ${ user_prior_name_change6_to }
+  - Edit: user_prior_name_change6_reason
+    button: |
+      Reason (6):
+      ${ user_prior_name_change6_reason }
+  - Edit: docket_numbers
+    button: |
+      docket_numbers:
+      ${ docket_numbers }
+  - Edit: users[0].name.middle
+    button: |
+      users[0].name.middle:
+      ${ users[0].name.middle }
+  - Edit: users[0].name.last
+    button: |
+      users[0].name.last:
+      ${ users[0].name.last }
+  - Edit: courts[0].division
+    button: |
+      courts[0].division:
+      ${ courts[0].division }
+  - Edit: users[0].name.first
+    button: |
+      users[0].name.first:
+      ${ users[0].name.first }
+  - Edit: users[0].address.address
+    button: |
+      users[0].address.address:
+      ${ users[0].address.address }
+  - Edit: users[0].address.unit
+    button: |
+      users[0].address.unit:
+      ${ users[0].address.unit }
+  - Edit: users[0].address.city
+    button: |
+      users[0].address.city:
+      ${ users[0].address.city }
+  - Edit: users[0].address.state
+    button: |
+      users[0].address.state:
+      ${ users[0].address.state }
+  - Edit: users[0].address.zip
+    button: |
+      users[0].address.zip:
+      ${ users[0].address.zip }
+  - Edit: users[0].phone_number
+    button: |
+      users[0].phone_number:
+      ${ users[0].phone_number }
+  - Edit: users[0].email
+    button: |
+      users[0].email:
+      ${ users[0].email }
+  - Edit: signature_date
+    button: |
+      signature_date:
+      ${ signature_date }
+  - Edit: users[0].signature
+    button: |
+      users[0].signature:
+      ${ users[0].signature }
+  - Edit: users[0]
+    button: |
+      users[0]:
+      ${ users[0] }
+  - Edit: attorneys[0].signature
+    button: |
+      attorneys[0].signature:
+      ${ attorneys[0].signature }
+  - Edit: attorneys[0]
+    button: |
+      attorneys[0]:
+      ${ attorneys[0] }
+  - Edit: attorneys[0].address.address
+    button: |
+      attorneys[0].address.address:
+      ${ attorneys[0].address.address }
+  - Edit: attorneys[0].address.unit
+    button: |
+      attorneys[0].address.unit:
+      ${ attorneys[0].address.unit }
+  - Edit: attorneys[0].address.state
+    button: |
+      attorneys[0].address.state:
+      ${ attorneys[0].address.state }
+  - Edit: attorneys[0].address.city
+    button: |
+      attorneys[0].address.city:
+      ${ attorneys[0].address.city }
+  - Edit: attorneys[0].address.zip
+    button: |
+      attorneys[0].address.zip:
+      ${ attorneys[0].address.zip }
+  - Edit: attorneys[0].phone_number
+    button: |
+      attorneys[0].phone_number:
+      ${ attorneys[0].phone_number }
+  - Edit: attorneys[0].email
+    button: |
+      attorneys[0].email:
+      ${ attorneys[0].email }
