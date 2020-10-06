@@ -51,6 +51,14 @@ code: |
   allowed_courts = interview_metadata["petition_to_change_name_of_adult"]["allowed courts"]
   nav.set_section('review_petition_to_change_name_of_adult')
   user_role = 'plaintiff'
+  users[0].name.first
+  users[0].name.middle
+  users[0].name.last
+  users[0].address.address
+  users[0].address.unit
+  users[0].address.city
+  users[0].address.state
+  users[0].address.zip
   user_mail_address_street
   user_prior_name_change_yes
   user_prior_name_change1_from
@@ -65,15 +73,7 @@ code: |
   interpreter_language
   attorney_bbo
   docket_numbers
-  users[0].name.middle
-  users[0].name.last
   courts[0].division
-  users[0].name.first
-  users[0].address.address
-  users[0].address.unit
-  users[0].address.city
-  users[0].address.state
-  users[0].address.zip
   users[0].phone_number
   users[0].email
   signature_date
