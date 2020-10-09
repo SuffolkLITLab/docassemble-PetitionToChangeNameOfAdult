@@ -59,7 +59,9 @@ code: |
   users[0].address.city
   users[0].address.state
   users[0].address.zip
-  user_mail_address_street
+  different_mailing_adddress_yes
+  if different_mailing_address_no:
+    user_mail_address_street
   user_prior_name_change_yes
   user_prior_name_change1_from
   user_prior_name_change2_from
@@ -110,6 +112,15 @@ subquestion: |
   
    ${petition_to_change_name_of_adult_attachment['preview']}
 ---
+id: Is the address you just entered your mailing address?
+question: |
+  Is the address you just entered your mailing address?
+fields:
+  - 'Yes': different_mailing_adddress_yes
+    datatype: yesno
+  - 'No': different_mailing_address_no
+    datatype: yesno
+---
 id: What is your mailing address?
 question: |
   What is your mailing address?
@@ -128,9 +139,9 @@ question: |
 subquestion: |
   Placeholder text
 fields:
-  - 'Have you changed your name before? (yes)': user_prior_name_change_yes
+  - 'Yes': user_prior_name_change_yes
     datatype: yesno
-  - 'Have you changed your name before? (no)': user_prior_name_change_no
+  - 'No': user_prior_name_change_no
     datatype: yesno
 ---
 id: What was your first name change?
