@@ -59,8 +59,8 @@ code: |
   users[0].address.city
   users[0].address.state
   users[0].address.zip
-  different_mailing_adddress_yes
-  if different_mailing_address_no:
+  different_mailing_address
+  if not different_mailing_address:
     user_mail_address_street
   user_prior_name_change_yes
   user_prior_name_change1_from
@@ -116,10 +116,8 @@ id: Is the address you just entered your mailing address?
 question: |
   Is the address you just entered your mailing address?
 fields:
-  - 'Yes': different_mailing_adddress_yes
-    datatype: yesno
-  - 'No': different_mailing_address_no
-    datatype: yesno
+  - no label: different_mailing_address
+    datatype: yesnoradio
 ---
 id: What is your mailing address?
 question: |
@@ -141,9 +139,9 @@ subquestion: |
   Placeholder text
 fields:
   - 'Yes': user_prior_name_change_yes
-    datatype: yesno
+    datatype: yesnowide
   - 'No': user_prior_name_change_no
-    datatype: yesno
+    datatype: yesnowide
 ---
 id: What was your first name change?
 question: |

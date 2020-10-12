@@ -43,7 +43,7 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
     return out
 
 setup(name='docassemble.PetitionToChangeNameOfAdult',
-      version='0.1.2',
+      version='0.1.3',
       description=(''),
       long_description='This is a form for allowing an adult to change their legal name.',
       long_description_content_type='text/markdown',
