@@ -130,6 +130,7 @@ fields:
   - 'Street Address': user_mail_address_street
   - 'City': user_mail_address_city
   - 'Unit': user_mail_address_street2
+    required: False
   - 'Zip': user_mail_address_zip
   - 'State': user_mail_address_state
 ---
