@@ -63,9 +63,12 @@ code: |
   if not different_mailing_address:
     user_mail_address_street
   user_prior_name_change_yes
-  user_prior_name_change1_from
-  user_prior_name_change2_from
-  user_prior_name_change3_from
+  if user_prior_name_change_yes:
+    user_prior_name_change1_from
+  if not user_last_name_change:
+    user_prior_name_change2_from
+  if not user_last_name_change:
+    user_prior_name_change3_from
   user_prior_name_change4_from
   user_prior_name_change5_from
   user_prior_name_change6_from
@@ -150,18 +153,22 @@ subquestion: |
   Placeholder text
 fields:
   - 'Birth name': user_prior_name_change1_from
-  - 'To (1)': user_prior_name_change1_to
-  - 'Reason (1)': user_prior_name_change1_reason
+  - 'To': user_prior_name_change1_to
+  - 'Reason': user_prior_name_change1_reason
+  - 'Was this your last name change?': user_last_name_change
+    datatype: yesnoradio
 ---
 id: What was your second name change?
 question: |
-  What was your second name change?
+  What name did you change to from ${user_prior_name_change1_to}
 subquestion: |
   Placeholder text
 fields:
-  - 'From (2)': user_prior_name_change2_from
-  - 'To (2)': user_prior_name_change2_to
-  - 'Reason (2)': user_prior_name_change2_reason
+  - 'From': user_prior_name_change2_from
+  - 'To': user_prior_name_change2_to
+  - 'Reason': user_prior_name_change2_reason
+  - 'Was this your last name change?': user_last_name_change
+    datatype: yesnoradio
 ---
 id: What was your third name change?
 question: |
