@@ -41,9 +41,6 @@ features:
 sections:
   - review_petition_to_change_name_of_adult: Review your answers
 ---
-code: |
-  user_final_name_change = True
----
 id: interview_order_petition_to_change_name_of_adult
 code: |
   # This is a placeholder to control logic flow in this interview
@@ -382,14 +379,14 @@ review:
     button: |
       State:
       ${ user_mail_address_state }
-  - Edit: user_prior_name_change_yes
-    button: |
-      Have you changed your name before? (yes):
-      ${ word(yesno(user_prior_name_change_yes)) }
-  - Edit: user_prior_name_change_no
-    button: |
-      Have you changed your name before? (no):
-      ${ word(yesno(user_prior_name_change_no)) }
+  #- Edit: user_prior_name_change_yes
+  #  button: |
+  #    Have you changed your name before? (yes):
+  #    ${ word(yesno(user_prior_name_change_yes)) }
+  #- Edit: user_prior_name_change_no
+  #  button: |
+  #    Have you changed your name before? (no):
+  #    ${ word(yesno(user_prior_name_change_no)) }
   - Edit: user_prior_name_change1_from
     button: |
       Birth name:
