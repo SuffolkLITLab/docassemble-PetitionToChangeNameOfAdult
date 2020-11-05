@@ -120,6 +120,22 @@ subquestion: |
   
    ${petition_to_change_name_of_adult_attachment['preview']}
 ---
+id: your address
+question: |
+  What is your address?
+fields:
+  - Street address: users[0].address.address
+    address autocomplete: True
+  - Unit: users[0].address.unit
+    required: False
+  - City: users[0].address.city
+  - State: users[0].address.state
+    code: |
+      states_list()
+    default: MA      
+  - Zip: users[0].address.zip
+    required: False
+---
 id: Is the address you just entered your mailing address?
 question: |
   Is the address you just entered your mailing address?
@@ -130,15 +146,17 @@ fields:
 id: What is your mailing address?
 question: |
   What is your mailing address?
-subquestion: |
-  Placeholder text
 fields:
   - 'Street Address': user_mail_address_street
-  - 'City': user_mail_address_city
   - 'Unit': user_mail_address_street2
     required: False
-  - 'Zip': user_mail_address_zip
+  - 'City': user_mail_address_city
   - 'State': user_mail_address_state
+    code: |
+      states_list()
+    default: MA 
+  - 'Zip': user_mail_address_zip
+    required: False
 ---
 id: Have you changed your name before?
 question: |
@@ -230,17 +248,11 @@ question: |
 subquestion: |
   Placeholder text
 fields:
-  - 'New middle name': user_name_middle_new
   - 'New first name': user_name_first_new
+  - 'New middle name': user_name_middle_new
+    required: False
   - 'New last name': user_name_last_new
----
-id: Why do you want to change your name
-question: |
-  Why do you want to change your name
-subquestion: |
-  Placeholder text
-fields:
-  - 'Why do you want to change your name?': user_name_change_reason
+  - 'Reason for your name change': user_name_change_reason
 ---
 id: Delete
 question: |
