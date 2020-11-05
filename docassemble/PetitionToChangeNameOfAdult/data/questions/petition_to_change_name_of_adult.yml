@@ -81,25 +81,28 @@ code: |
   user_name_middle_new
   user_name_change_reason
   interpreter_language
-  docket_numbers
   courts[0].division
+  docket_number
   users[0].phone_number
   users[0].email
   signature_date
+  attorney_helping
   str(users[0])
-  str(attorneys[0])
-  attorneys[0].address.address
-  attorneys[0].address.unit
-  attorneys[0].address.state
-  attorneys[0].address.city
-  attorneys[0].address.zip
-  attorneys[0].phone_number
-  attorneys[0].email
-  attorney_bbo
+  if attorney_helping:
+    str(attorneys[0])
+    attorneys[0].address.address
+    attorneys[0].address.unit
+    attorneys[0].address.state
+    attorneys[0].address.city
+    attorneys[0].address.zip
+    attorneys[0].phone_number
+    attorneys[0].email
+    attorney_bbo
   petition_to_change_name_of_adult_preview_question # Pre-canned preview screen
   basic_questions_signature_flow
   users[0].signature
-  attorneys[0].signature
+  if attorney_helping:
+    attorneys[0].signature
   petition_to_change_name_of_adult = True
 ---
 comment: |
@@ -183,7 +186,7 @@ question: |
 subquestion: |
   What name did you change to from ${user_prior_name_change1_to}
 fields:
-  - 'From': user_prior_name_change2_from
+  #- 'From': user_prior_name_change2_from
   - 'To': user_prior_name_change2_to
   - 'Reason': user_prior_name_change2_reason
   - 'Was this your final name change?': user_final_name_change
@@ -195,7 +198,7 @@ question: |
 subquestion: |
   What name did you change to from ${user_prior_name_change2_to}
 fields:
-  - 'From': user_prior_name_change3_from
+  #- 'From': user_prior_name_change3_from
   - 'To': user_prior_name_change3_to
   - 'Reason': user_prior_name_change3_reason
   - 'Was this your final name change?': user_final_name_change
@@ -207,7 +210,7 @@ question: |
 subquestion: |
   What name did you change to from ${user_prior_name_change3_to}
 fields:
-  - 'From': user_prior_name_change4_from
+  #- 'From': user_prior_name_change4_from
   - 'To': user_prior_name_change4_to
   - 'Reason': user_prior_name_change4_reason
   - 'Was this your final name change?': user_final_name_change
@@ -219,7 +222,7 @@ question: |
 subquestion: |
   What name did you change to from ${user_prior_name_change4_to}
 fields:
-  - 'From': user_prior_name_change5_from
+  #- 'From': user_prior_name_change5_from
   - 'To': user_prior_name_change5_to
   - 'Reason': user_prior_name_change5_reason
   - 'Was this your final name change?': user_final_name_change
@@ -231,7 +234,7 @@ question: |
 subquestion: |
   What name did you change to from ${user_prior_name_change5_to}
 fields:
-  - 'From': user_prior_name_change6_from
+  #- 'From': user_prior_name_change6_from
   - 'To': user_prior_name_change6_to
   - 'Reason': user_prior_name_change6_reason
 ---
@@ -264,11 +267,22 @@ fields:
   - 'Would you like an interpreter?': request_interpreter
     datatype: yesno
 ---
+id: What is the docket number?
+question: |
+  What is the docket number?
+fields:
+  - 'Docket number': docket_number
+---
+id: Is an attorney helping you with this form?
+question: |
+  Is an attorney helping you with this form?
+fields:
+  - no label: attorney_helping
+    datatype: yesnoradio
+---
 id: What is the attorney's BBO number?
 question: |
   What is the attorney's BBO number?
-subquestion: |
-  Placeholder text
 fields:
   - 'Attorney BBO': attorney_bbo
 ---
@@ -301,7 +315,7 @@ attachment:
     skip undefined: True
     pdf template file: petition_to_change_name_of_adult.pdf
     fields: 
-      - "docket_number": ${ docket_numbers }
+      - "docket_number": ${ docket_number }
       - "user_name_middle": ${ users[0].name.middle }
       - "user_name_last": ${ users[0].name.last }
       - "court_division": ${ courts[0].division }
@@ -503,10 +517,10 @@ review:
     button: |
       Reason (6):
       ${ user_prior_name_change6_reason }
-  - Edit: docket_numbers
+  - Edit: docket_number
     button: |
-      docket_numbers:
-      ${ docket_numbers }
+      docket_number:
+      ${ docket_number }
   - Edit: users[0].name.middle
     button: |
       users[0].name.middle:
