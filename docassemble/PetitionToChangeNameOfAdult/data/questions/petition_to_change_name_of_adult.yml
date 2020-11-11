@@ -80,7 +80,7 @@ code: |
   request_return_of_docs
   user_name_middle_new
   user_name_change_reason
-  interpreter_language
+  user_needs_interpreter
   courts[0].division
   docket_number
   users[0].phone_number
@@ -241,8 +241,6 @@ fields:
 id: Do you want the court to return your documents to you?
 question: |
   Do you want the court to return your documents to you?
-subquestion: |
-  Placeholder text
 yesno: request_return_of_docs
 ---
 id: What is your new name?
@@ -256,16 +254,6 @@ fields:
     required: False
   - 'New last name': user_name_last_new
   - 'Reason for your name change': user_name_change_reason
----
-id: Delete
-question: |
-  Delete
-subquestion: |
-  Placeholder text
-fields:
-  - 'Interpreter language': interpreter_language
-  - 'Would you like an interpreter?': request_interpreter
-    datatype: yesno
 ---
 id: What is the docket number?
 question: |
@@ -328,7 +316,7 @@ attachment:
       - "user_address_city": ${ users[0].address.city }
       - "user_address_state": ${ users[0].address.state }
       - "user_address_zip": ${ users[0].address.zip }
-      - "user_phone": ${ users[0].phone_number }
+      - "user_phone": ${ users[0].phone_numbers() }
       - "user_email": ${ users[0].email }
       - "signature_date": ${ signature_date }
       # If it is a signature, test which file version we're expecting. leave it empty unless it's the final attachment version
@@ -365,8 +353,8 @@ attachment:
       - "user_name_first_new": ${ user_name_first_new }
       - "user_name_last_new": ${ user_name_last_new }
       - "user_name_change_reason": ${ user_name_change_reason }
-      - "interpreter_language": ${ interpreter_language }
-      - "request_interpreter": ${ request_interpreter }
+      - "interpreter_language": ${ user_preferred_language if user_needs_interpreter    else "" }
+      - "request_interpreter": ${ user_needs_interpreter }
       - "attorney_bbo": ${ attorney_bbo }
       - "user_prior_name_change4_from": ${ user_prior_name_change3_to }
       - "user_prior_name_change4_to": ${ user_prior_name_change4_to }
