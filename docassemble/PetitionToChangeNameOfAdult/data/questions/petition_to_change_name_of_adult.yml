@@ -1,3 +1,8 @@
+---
+include:
+  - docassemble.AssemblyLine:al_package.yml
+  - docassemble.MassAccess:massaccess.yml  
+---
 comment: |
   The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
 metadata:
@@ -19,10 +24,10 @@ code: |
     'description': 'Request to change the name of an adult',
     'original_form': 'https://www.mass.gov/doc/petition-to-change-name-of-adult-cjp-27/download',
     'allowed courts': [
-      'Boston Municipal Court',
-      'District Court',
+      # 'Boston Municipal Court',
+      # 'District Court',
       'Probate and Family Court',
-      'Superior Court',
+      # 'Superior Court',
     ],
     'categories': [
       'Family Law',
@@ -32,57 +37,69 @@ code: |
     'typical role': 'plaintiff',
   })
 ---
-include:
-  - docassemble.MAVirtualCourt:basic-questions.yml
----
 features:
   navigation: True
 ---
 sections:
   - review_petition_to_change_name_of_adult: Review your answers
 ---
+code: interview_short_title = "Ask the court to change your name"
+---
+code: form_approved_for_email_filing = False
+---
+objects:
+  - users: PeopleList.using(ask_number=True, target_number=1)
+  - past_names: DAList.using(object_type=DAObject, complete_attribute='reason')
+---
+objects:
+  - past_names[i].new_name: IndividualName
+  - past_names[i].old_name: IndividualName
+---
+mandatory: True
 id: interview_order_petition_to_change_name_of_adult
 code: |
   # This is a placeholder to control logic flow in this interview
-
-  basic_questions_intro_screen 
+  al_form_type == 'starts_case'
+  al_intro_screen 
   petition_to_change_name_of_adult_intro
+  screen_name_change_reason
+  if screen_name_change_reason != "other":
+    kick_out_dont_need_petition
   # Set the allowed courts for this interview
   allowed_courts = interview_metadata["petition_to_change_name_of_adult"]["allowed courts"]
   nav.set_section('review_petition_to_change_name_of_adult')
   user_role = 'plaintiff'
   users[0].name.first
-  users[0].name.middle
-  users[0].name.last
   users[0].address.address
-  users[0].address.unit
-  users[0].address.city
-  users[0].address.state
-  users[0].address.zip
   different_mailing_address
   if not different_mailing_address:
     user_mail_address_street
-  user_prior_name_change
-  if user_prior_name_change:
-    user_prior_name_change1_to
-  else:
-    user_final_name_change = True
-  if not user_final_name_change:
-    user_prior_name_change2_to
-  if not user_final_name_change:
-    user_prior_name_change3_to
-  if not user_final_name_change:
-    user_prior_name_change4_to
-  if not user_final_name_change:
-    user_prior_name_change5_to
-  if not user_final_name_change:
-    user_prior_name_change6_to
+  if past_names.there_are_any:
+    past_names_instruction
+    past_names.gather()
+    review_past_names
+  # past_names.gather()
+  # user_prior_name_change
+  # if user_prior_name_change:
+  #   user_prior_name_change1_to
+  # else:
+  #   user_final_name_change = True
+  # if not user_final_name_change:
+  #   user_prior_name_change2_to
+  # if not user_final_name_change:
+  #   user_prior_name_change3_to
+  # if not user_final_name_change:
+  #   user_prior_name_change4_to
+  # if not user_final_name_change:
+  #   user_prior_name_change5_to
+  # if not user_final_name_change:
+  #   user_prior_name_change6_to
   request_return_of_docs
   user_name_middle_new
   user_name_change_reason
   user_needs_interpreter
-  courts[0].division
-  docket_number
+  trial_court
+  # docket_number = DAEmpty()
   users[0].phone_number
   users[0].email
   signature_date
@@ -91,37 +108,86 @@ code: |
   if attorney_helping:
     str(attorneys[0])
     attorneys[0].address.address
-    attorneys[0].address.unit
-    attorneys[0].address.state
-    attorneys[0].address.city
-    attorneys[0].address.zip
     attorneys[0].phone_number
     attorneys[0].email
     attorney_bbo
-  petition_to_change_name_of_adult_preview_question # Pre-canned preview screen
+  petition_to_change_name_of_adult_preview_question
   basic_questions_signature_flow
   users[0].signature
   if attorney_helping:
     attorneys[0].signature
-  petition_to_change_name_of_adult = True
+  petition_to_change_name_of_adult_download    
+  # petition_to_change_name_of_adult = True
 ---
-comment: |
-  This question is used to introduce your interview. Please customize
 id: Petition to Change Name of Adult
 continue button field: petition_to_change_name_of_adult_intro
 question: |
-  Petition to Change Name of Adult
+  Changing your name on official documents
 subquestion: |
-  Request to change the name of an adult
+  You can use this form to change your name if you are over the age of
+  18 and live in Massachusetts. This form is called a petition.
+  
+  To file your petition, you will also need:
+  
+  * A certified copy of your birth certificate. You can get this from your city hall.
+  * A Court Activity Record Information (CARI) authorization form. We will help you fill in the CARI form.
+  * A copy of any certified documents showing your **past** name changes. If you have never changed your name before you do not need this.
+  
+  There is a fee for requesting a name change. If you cannot afford the fee,
+  you will not be charged. We will help you request a fee waiver if you are
+  eligible.
+  
+  You will need to get this document notarized before you file it.
 ---
-id: Placeholder preview screen
+id: right form
+question: |
+  Is this the right form for you?
+subquestion: |
+  Why are you changing your name?
+field: screen_name_change_reason
+choices:
+  - I am getting married.: married
+  - I am getting divorced.: divorced
+  - I am becoming a United States Citizen.: citizen
+  - I have another reason for changing my name.: other
+---
+event: kick_out_dont_need_petition
+id: kickout
+decoration: hand-paper
+question: |
+  This is not the right form for you
+subquestion: |
+  If you are getting married, divorced, or becoming a United States
+  Citizen, you **do not need** to file a petition for a name change.
+  You can change your name as part of the marriage, divorce, or citizenship
+  process.
+  
+  [Learn more](https://www.mass.gov/how-to/legally-change-your-name-as-an-adult).
+---
+id: your name
+sets:
+    - users[0].name.first
+    - users[0].name.last
+question:  |
+  What is your current legal name?
+fields:
+  - code: |
+      users[0].name_fields()
+---
+id: preview screen
 continue button field: petition_to_change_name_of_adult_preview_question
 question: |
-  Placeholder preview screen
+  Review your form before you sign it
 subquestion: |
-  Here is a preview of the form you'll sign on the next page. 
+  Here is a preview of the form you will sign on the next page. 
   
-   ${petition_to_change_name_of_adult_attachment['preview']}
+   ${ al_user_bundle.as_pdf(key='preview') }
+  
+  Click the image to open it in a new tab. Click the 'Make changes' button to fix any mistakes.
+  
+  ${ action_button_html(url_action('review_petition_to_change_name_of_adult'), label='Make changes', color='info') } 
+  
+  Remember to come back to this window to continue and sign your form.
 ---
 id: your address
 question: |
@@ -165,8 +231,47 @@ id: Have you changed your name before?
 question: |
   Have you changed your name before?
 fields:
-  - no label: user_prior_name_change
+  - no label: past_names.there_are_any
     datatype: yesnoradio
+---
+id: past names instruction
+question: |
+  Your past names
+subquestion: |
+  Tell us about your past names one at a time, starting with your birth
+  name.
+  
+  Remember, you will need to file a certified copy of your past name
+  changes.
+continue button field: past_names_instruction
+---
+table: past_names.table
+rows: past_names
+columns:
+  - Former name: |
+      row_item.old_name
+  - New name: |
+      row_item.new_name
+  - Reason for change: |
+      row_item.reason
+edit:
+  - old_name.first
+---
+id: review past names
+question: |
+  Your past names
+subquestion: |
+  Take a minute to review what you told us about your past names.
+  
+  If this looks right, click "Next". Click "edit" to make any changes you
+  need.
+  
+  ${ past_names.table }
+  
+  ${ past_names.add_action() }
+continue button field: review_past_names
+---
+code: user_prior_name_change = past_names.there_are_any
 ---
 id: What was your first name change?
 question: |
@@ -174,80 +279,35 @@ question: |
 subquestion: |
   What name did you change to from your birthname?
 fields:
-  - 'Birth name': user_prior_name_change1_from
-  - 'To': user_prior_name_change1_to
-  - 'Reason': user_prior_name_change1_reason
-  - 'Was this your final name change?': user_final_name_change
-    datatype: yesnoradio
+  - 'Birth name': past_names[0].old_name.first
+  - 'To': past_names[0].new_name.first
+  - 'Reason': past_names[0].reason  
 ---
-id: What was your second name change?
+id: another name change
 question: |
-  What was your second name change?
-subquestion: |
-  What name did you change to from ${user_prior_name_change1_to}
-fields:
-  #- 'From': user_prior_name_change2_from
-  - 'To': user_prior_name_change2_to
-  - 'Reason': user_prior_name_change2_reason
-  - 'Was this your final name change?': user_final_name_change
-    datatype: yesnoradio
+  Is there another time you changed your name?
+yesno: past_names.there_is_another  
 ---
-id: What was your third name change?
+id: nth name change
 question: |
-  What was your third name change?
-subquestion: |
-  What name did you change to from ${user_prior_name_change2_to}
+  What was your ${ ordinal(i) } name change?
 fields:
-  #- 'From': user_prior_name_change3_from
-  - 'To': user_prior_name_change3_to
-  - 'Reason': user_prior_name_change3_reason
-  - 'Was this your final name change?': user_final_name_change
-    datatype: yesnoradio
----
-id: What was your fourth name change?
-question: |
-  What was your fourth name change?
-subquestion: |
-  What name did you change to from ${user_prior_name_change3_to}
-fields:
-  #- 'From': user_prior_name_change4_from
-  - 'To': user_prior_name_change4_to
-  - 'Reason': user_prior_name_change4_reason
-  - 'Was this your final name change?': user_final_name_change
-    datatype: yesnoradio
----
-id: What was your fifth name change?
-question: |
-  What was your fifth name change?
-subquestion: |
-  What name did you change to from ${user_prior_name_change4_to}
-fields:
-  #- 'From': user_prior_name_change5_from
-  - 'To': user_prior_name_change5_to
-  - 'Reason': user_prior_name_change5_reason
-  - 'Was this your final name change?': user_final_name_change
-    datatype: yesnoradio
----
-id: What was your sixth name change?
-question: |
-  What was your sixth name change?
-subquestion: |
-  What name did you change to from ${user_prior_name_change5_to}
-fields:
-  #- 'From': user_prior_name_change6_from
-  - 'To': user_prior_name_change6_to
-  - 'Reason': user_prior_name_change6_reason
+  - 'From': past_names[i].old_name.first
+    default: ${ past_names[i-1].new_name.first }
+  - 'To': past_names[i].new_name.first
+  - 'Reason': past_names[i].reason
 ---
 id: Do you want the court to return your documents to you?
 question: |
-  Do you want the court to return your documents to you?
+  Do you want the court to return your certified documents to you?
+subquestion: |
+  If you want, you can ask the court to mail back the certified documents
+  you send them, including your birth certificate.
 yesno: request_return_of_docs
 ---
 id: What is your new name?
 question: |
   What is your new name?
-subquestion: |
-  Placeholder text
 fields:
   - 'New first name': user_name_first_new
   - 'New middle name': user_name_middle_new
@@ -275,26 +335,35 @@ fields:
   - 'Attorney BBO': attorney_bbo
 ---
 progress: 100
-mandatory: True
-id: Placeholder download screen
+id: download
+event: petition_to_change_name_of_adult_download
 question: |
-  Placeholder download screen
+  Your form is ready to download.
 subquestion: |
-  Placeholder
+  Thank you ${users}. Your form is ready to download and deliver.
   
-  ### Next steps
+  View, download and send your form below. Click the "Make changes" button to fix any mistakes. 
   
-  1. Step 1
-  1. Step 2
+  ${ action_button_html(url_action('review_petition_to_change_name_of_adult'), label='Make changes', color='info') } 
   
-  Below is a preview of your form.
+  ${ al_user_bundle.download_list_html() }
   
-  ${petition_to_change_name_of_adult_attachment['final'] }
-need: petition_to_change_name_of_adult
-attachment code: petition_to_change_name_of_adult_attachment['final']
+  ${ al_user_bundle.send_button_html() }
 ---
 objects:
-  - petition_to_change_name_of_adult_attachment: DADict
+  - petition_to_change_name_of_adult_attachment: ALDocument.using(filename="petition_to_change_name_of_adult", title="Petition to Change Name of Adult", enabled=True, has_addendum=True)
+---
+code: | 
+  petition_to_change_name_of_adult_attachment.overflow_fields['past_names'].overflow_trigger = 3
+  petition_to_change_name_of_adult_attachment.overflow_fields.gathered = True
+---
+attachment:
+  variable name: petition_to_change_name_of_adult_attachment.addendum
+  docx template file: petition_to_change_name_of_adult_addendum.docx
+---
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[petition_to_change_name_of_adult_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")
+  - al_court_bundle: ALDocumentBundle.using(elements=[petition_to_change_name_of_adult_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")  
 ---
 attachment:
     variable name: petition_to_change_name_of_adult_attachment[i]
@@ -303,10 +372,10 @@ attachment:
     skip undefined: True
     pdf template file: petition_to_change_name_of_adult.pdf
     fields: 
-      - "docket_number": ${ docket_number }
+      # - "docket_number": ${ docket_number }
       - "user_name_middle": ${ users[0].name.middle }
       - "user_name_last": ${ users[0].name.last }
-      - "court_division": ${ courts[0].division }
+      - "court_division": ${ trial_court.division }
       - "user_name_first": ${ users[0].name.first }
       - "user_name_first__2": ${ users[0].name.first }
       - "user_name_middle__2": ${ users[0].name.middle }
@@ -337,17 +406,17 @@ attachment:
       - "user_mail_address_street2": ${ user_mail_address_street2 }
       - "user_mail_address_zip": ${ user_mail_address_zip }
       - "user_mail_address_state": ${ user_mail_address_state }
-      - "user_prior_name_change_yes": ${ user_prior_name_change }
-      - "user_prior_name_change_no": ${ not user_prior_name_change }
-      - "user_prior_name_change1_from": ${ user_prior_name_change1_from }
-      - "user_prior_name_change1_to": ${ user_prior_name_change1_to }
-      - "user_prior_name_change1_reason": ${ user_prior_name_change1_reason }
-      - "user_prior_name_change2_from": ${ user_prior_name_change1_to }
-      - "user_prior_name_change2_to": ${ user_prior_name_change2_to }
-      - "user_prior_name_change2_reason": ${ user_prior_name_change2_reason }
-      - "user_prior_name_change3_from": ${ user_prior_name_change2_to }
-      - "user_prior_name_change3_to": ${ user_prior_name_change3_to }
-      - "user_prior_name_change3_reason": ${ user_prior_name_change3_reason }
+      - "user_prior_name_change_yes": ${ past_names.there_are_any }
+      - "user_prior_name_change_no": ${ not past_names.there_are_any }
+      - "user_prior_name_change1_from": ${ past_names.item(0).old_name }
+      - "user_prior_name_change1_to": ${ past_names.item(0).new_name }
+      - "user_prior_name_change1_reason": ${ past_names.item(0).reason }
+      - "user_prior_name_change2_from": ${ past_names.item(1).old_name }
+      - "user_prior_name_change2_to": ${ past_names.item(1).new_name }
+      - "user_prior_name_change2_reason": ${ past_names.item(1).reason }
+      - "user_prior_name_change3_from": ${ past_names.item(2).old_name }
+      - "user_prior_name_change3_to": ${ past_names.item(2).new_name }
+      - "user_prior_name_change3_reason": ${ past_names.item(2).reason }
       - "request_return_of_docs": ${ request_return_of_docs }
       - "user_name_middle_new": ${ user_name_middle_new }
       - "user_name_first_new": ${ user_name_first_new }
@@ -356,15 +425,6 @@ attachment:
       - "interpreter_language": ${ user_preferred_language if user_needs_interpreter    else "" }
       - "request_interpreter": ${ user_needs_interpreter }
       - "attorney_bbo": ${ attorney_bbo }
-      - "user_prior_name_change4_from": ${ user_prior_name_change3_to }
-      - "user_prior_name_change4_to": ${ user_prior_name_change4_to }
-      - "user_prior_name_change4_reason": ${ user_prior_name_change4_reason }
-      - "user_prior_name_change5_from": ${ user_prior_name_change4_to }
-      - "user_prior_name_change5_to": ${ user_prior_name_change5_to }
-      - "user_prior_name_change5_reason": ${ user_prior_name_change5_reason }
-      - "user_prior_name_change6_from": ${ user_prior_name_change5_to }
-      - "user_prior_name_change6_to": ${ user_prior_name_change6_to }
-      - "user_prior_name_change6_reason": ${ user_prior_name_change6_reason }
 ---
 id: petition_to_change_name_of_adult review screen
 event: review_petition_to_change_name_of_adult
@@ -393,50 +453,6 @@ review:
     button: |
       State:
       ${ user_mail_address_state }
-  #- Edit: user_prior_name_change_yes
-  #  button: |
-  #    Have you changed your name before? (yes):
-  #    ${ word(yesno(user_prior_name_change_yes)) }
-  #- Edit: user_prior_name_change_no
-  #  button: |
-  #    Have you changed your name before? (no):
-  #    ${ word(yesno(user_prior_name_change_no)) }
-  - Edit: user_prior_name_change1_from
-    button: |
-      Birth name:
-      ${ user_prior_name_change1_from }
-  - Edit: user_prior_name_change1_to
-    button: |
-      To (1):
-      ${ user_prior_name_change1_to }
-  - Edit: user_prior_name_change1_reason
-    button: |
-      Reason (1):
-      ${ user_prior_name_change1_reason }
-  - Edit: user_prior_name_change2_from
-    button: |
-      From (2):
-      ${ user_prior_name_change2_from }
-  - Edit: user_prior_name_change2_to
-    button: |
-      To (2):
-      ${ user_prior_name_change2_to }
-  - Edit: user_prior_name_change2_reason
-    button: |
-      Reason (2):
-      ${ user_prior_name_change2_reason }
-  - Edit: user_prior_name_change3_from
-    button: |
-      From (3):
-      ${ user_prior_name_change3_from }
-  - Edit: user_prior_name_change3_to
-    button: |
-      To (3):
-      ${ user_prior_name_change3_to }
-  - Edit: user_prior_name_change3_reason
-    button: |
-      Reason (3):
-      ${ user_prior_name_change3_reason }
   - Edit: request_return_of_docs
     button: |
       Do you want the court to return your documents to you:
@@ -469,42 +485,6 @@ review:
     button: |
       Attorney BBO:
       ${ attorney_bbo }
-  - Edit: user_prior_name_change4_from
-    button: |
-      From (4):
-      ${ user_prior_name_change4_from }
-  - Edit: user_prior_name_change4_to
-    button: |
-      To (4):
-      ${ user_prior_name_change4_to }
-  - Edit: user_prior_name_change4_reason
-    button: |
-      Reason (4):
-      ${ user_prior_name_change4_reason }
-  - Edit: user_prior_name_change5_from
-    button: |
-      From (5):
-      ${ user_prior_name_change5_from }
-  - Edit: user_prior_name_change5_to
-    button: |
-      To (5):
-      ${ user_prior_name_change5_to }
-  - Edit: user_prior_name_change5_reason
-    button: |
-      Reason (5):
-      ${ user_prior_name_change5_reason }
-  - Edit: user_prior_name_change6_from
-    button: |
-      From (6):
-      ${ user_prior_name_change6_from }
-  - Edit: user_prior_name_change6_to
-    button: |
-      To (6):
-      ${ user_prior_name_change6_to }
-  - Edit: user_prior_name_change6_reason
-    button: |
-      Reason (6):
-      ${ user_prior_name_change6_reason }
   - Edit: docket_number
     button: |
       docket_number:
@@ -517,10 +497,6 @@ review:
     button: |
       users[0].name.last:
       ${ users[0].name.last }
-  - Edit: courts[0].division
-    button: |
-      courts[0].division:
-      ${ courts[0].division }
   - Edit: users[0].name.first
     button: |
       users[0].name.first:
