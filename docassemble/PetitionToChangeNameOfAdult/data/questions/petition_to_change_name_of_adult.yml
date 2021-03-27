@@ -1,7 +1,8 @@
 ---
 include:
   - docassemble.AssemblyLine:al_package.yml
-  - docassemble.MassAccess:massaccess.yml  
+  - docassemble.MassAccess:massaccess.yml 
+  - docassemble.CARIRequest:cari_release.yml
 ---
 comment: |
   The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
@@ -78,28 +79,11 @@ code: |
     past_names_instruction
     past_names.gather()
     review_past_names
-  # past_names.gather()
-  # user_prior_name_change
-  # if user_prior_name_change:
-  #   user_prior_name_change1_to
-  # else:
-  #   user_final_name_change = True
-  # if not user_final_name_change:
-  #   user_prior_name_change2_to
-  # if not user_final_name_change:
-  #   user_prior_name_change3_to
-  # if not user_final_name_change:
-  #   user_prior_name_change4_to
-  # if not user_final_name_change:
-  #   user_prior_name_change5_to
-  # if not user_final_name_change:
-  #   user_prior_name_change6_to
   request_return_of_docs
   user_name_middle_new
   user_name_change_reason
   user_needs_interpreter
   trial_court
-  # docket_number = DAEmpty()
   users[0].phone_number
   users[0].email
   signature_date
@@ -111,13 +95,13 @@ code: |
     attorneys[0].phone_number
     attorneys[0].email
     attorney_bbo
+  interview_order_cari    
   petition_to_change_name_of_adult_preview_question
   basic_questions_signature_flow
   users[0].signature
   if attorney_helping:
     attorneys[0].signature
   petition_to_change_name_of_adult_download    
-  # petition_to_change_name_of_adult = True
 ---
 id: Petition to Change Name of Adult
 continue button field: petition_to_change_name_of_adult_intro
@@ -362,8 +346,17 @@ attachment:
   docx template file: petition_to_change_name_of_adult_addendum.docx
 ---
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[petition_to_change_name_of_adult_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")
-  - al_court_bundle: ALDocumentBundle.using(elements=[petition_to_change_name_of_adult_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")  
+  - al_user_bundle: ALDocumentBundle.using(elements=[petition_to_change_name_of_adult_attachment, cari_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")
+  - al_court_bundle: ALDocumentBundle.using(elements=[petition_to_change_name_of_adult_attachment, cari_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")  
+---
+code: cari_attachment.enabled = True
+---
+code: |
+  # Set some options for the CARI
+  case_name = "In re " + str(users)
+  docket_number = DAEmpty()
+  cari_reason = "name_change"
+  other_names_or_alias = "; ".join([str(name.old_name) for name in past_names])
 ---
 attachment:
     variable name: petition_to_change_name_of_adult_attachment[i]
