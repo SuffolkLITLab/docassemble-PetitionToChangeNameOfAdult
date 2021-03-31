@@ -3,6 +3,7 @@ include:
   - docassemble.AssemblyLine:al_package.yml
   - docassemble.MassAccess:massaccess.yml 
   - docassemble.CARIRequest:cari_release.yml
+  - docassemble.ALAffidavitOfIndigency:affidavit_body.yml
 ---
 comment: |
   The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
@@ -13,7 +14,8 @@ metadata:
     Name Change Petition
 ---
 comment: |
-  This section is used by MAVirtualCourts to control how some of the questions work.
+  This section is used by MAVirtualCourts to control how some of the
+  questions work.
 mandatory: True
 code: |
   interview_metadata # make sure we initialize the object
@@ -25,10 +27,7 @@ code: |
     'description': 'Request to change the name of an adult',
     'original_form': 'https://www.mass.gov/doc/petition-to-change-name-of-adult-cjp-27/download',
     'allowed courts': [
-      # 'Boston Municipal Court',
-      # 'District Court',
       'Probate and Family Court',
-      # 'Superior Court',
     ],
     'categories': [
       'Family Law',
@@ -44,33 +43,52 @@ features:
 sections:
   - review_petition_to_change_name_of_adult: Review your answers
 ---
-code: interview_short_title = "Ask the court to change your name"
+code: interview_short_title = "Ask the court to change your name on official documents"
 ---
 code: form_approved_for_email_filing = False
 ---
 objects:
   - users: PeopleList.using(ask_number=True, target_number=1)
+  - other_parties: PeopleList.using(there_are_any=False)
   - past_names: DAList.using(object_type=DAObject, complete_attribute='reason')
 ---
 objects:
   - past_names[i].new_name: IndividualName
   - past_names[i].old_name: IndividualName
+  
+---
+code: |
+  fees['Costs of an expert witness'].waive = False
+  fees['Filing fee'].waive = True
+  fees['Filing fee'].amount = 150
+  fees['Other cost'].waive = True
+  fees['Other cost'].amount = 30
+  fees['Other cost'].description = "Surcharge ($15) and fee for citation for publication ($15)."
+  case_name = "In the matter of " + users[0].name.full()
+  docket_numbers[0] = ''
+  set_indigency_defaults = True
 ---
 mandatory: True
 id: interview_order_petition_to_change_name_of_adult
 code: |
   # This is a placeholder to control logic flow in this interview
-  al_form_type == 'starts_case'
+  al_form_type = 'starts_case'
   al_intro_screen 
   petition_to_change_name_of_adult_intro
   screen_name_change_reason
-  if screen_name_change_reason != "other":
+  if screen_name_change_reason != "other" or not over_18:
     kick_out_dont_need_petition
+  if name_change_special_circumstances.any_true():
+    warn_name_change_special_circumstances
   # Set the allowed courts for this interview
   allowed_courts = interview_metadata["petition_to_change_name_of_adult"]["allowed courts"]
   nav.set_section('review_petition_to_change_name_of_adult')
   user_role = 'plaintiff'
+  user_ask_role = 'plaintiff'
+  user_name_first_new
+  user_name_change_reason  
   users[0].name.first
+  new_name_affirmation
   users[0].address.address
   different_mailing_address
   if not different_mailing_address:
@@ -80,8 +98,6 @@ code: |
     past_names.gather()
     review_past_names
   request_return_of_docs
-  user_name_middle_new
-  user_name_change_reason
   user_needs_interpreter
   trial_court
   users[0].phone_number
@@ -95,7 +111,9 @@ code: |
     attorneys[0].phone_number
     attorneys[0].email
     attorney_bbo
-  interview_order_cari    
+  interview_order_cari
+  set_indigency_defaults
+  ask_affidavit_questions
   petition_to_change_name_of_adult_preview_question
   basic_questions_signature_flow
   users[0].signature
@@ -108,32 +126,37 @@ continue button field: petition_to_change_name_of_adult_intro
 question: |
   Changing your name on official documents
 subquestion: |
-  You can use this form to change your name if you are over the age of
-  18 and live in Massachusetts. This form is called a petition.
+  You can use this form to change your name on official documents if you are
+  over the age of 18 and live in Massachusetts. This form is called a Petition
+  for Adult Name Change.
   
-  To file your petition, you will also need:
+  After you finish the interview you need to:
   
-  * A certified copy of your birth certificate. You can get this from your city hall.
-  * A Court Activity Record Information (CARI) authorization form. We will help you fill in the CARI form.
-  * A copy of any certified documents showing your **past** name changes. If you have never changed your name before you do not need this.
+  1. Sign the petition in front of a notary.
+  2. File it with the court.
   
-  There is a fee for requesting a name change. If you cannot afford the fee,
-  you will not be charged. We will help you request a fee waiver if you are
-  eligible.
+  You also need to file:
   
-  You will need to get this document notarized before you file it.
+  1. A **certified** copy of your birth certificate.
+  1. A **certified** copy of any past orders for a name change.
+  
+  If the judge grants your petition you must publish a notice of your name
+  change in a local newspaper.
 ---
 id: right form
 question: |
   Is this the right form for you?
-subquestion: |
-  Why are you changing your name?
-field: screen_name_change_reason
-choices:
-  - I am getting married.: married
-  - I am getting divorced.: divorced
-  - I am becoming a United States Citizen.: citizen
-  - I have another reason for changing my name.: other
+fields: 
+  - Why are you changing your name?: screen_name_change_reason
+    datatype: radio
+    choices:
+      - I am getting married.: married
+      - I am getting divorced.: divorced
+      - I am becoming a United States Citizen.: citizen
+      - I have another reason for changing my name.: other
+  - Are you at least 18?: over_18
+    datatype: yesnoradio
+    
 ---
 event: kick_out_dont_need_petition
 id: kickout
@@ -141,12 +164,50 @@ decoration: hand-paper
 question: |
   This is not the right form for you
 subquestion: |
+  % if not over_18:
+  This form helps **adults** change their name. You need to be at least 18
+  to use this form.
+  
+  [Learn more](https://www.mass.gov/service-details/find-out-who-can-change-their-name).
+  % endif
+  % if screen_name_change_reason != "other":
+  
   If you are getting married, divorced, or becoming a United States
   Citizen, you **do not need** to file a petition for a name change.
   You can change your name as part of the marriage, divorce, or citizenship
   process.
   
   [Learn more](https://www.mass.gov/how-to/legally-change-your-name-as-an-adult).
+  % endif
+---
+id: name change special circumstances
+question: |
+  Do any of the following apply to you?
+fields:
+  - no label: name_change_special_circumstances
+    datatype: checkboxes
+    choices:
+      - I am currently in jail.: in_jail
+      - I am on probation or parole.: on_parole
+      - I am currently committed to the Massachusetts Treatment Center as a **sexually dangerous person**.: is_sdp
+---
+continue button field: warn_name_change_special_circumstances
+question: |
+  Special circumstances for people on parole or in state custody
+subquestion: |
+  You said that you are currently in state custody or on parole or probation.
+  
+  You can still request a name change.
+  
+  1. The judge may ask for a hearing to allow you to explain why you
+  need a name change.
+  2. If the judge grants your petition, you need to **serve** the citation
+  by mail on the Department of Correction, Parole Board, or the Sex Offender
+  Registry Board.
+  2. You must also mail a copy to the prosecuting official where you were
+  convicted.
+
+  You will get more instructions about this later.
 ---
 id: your name
 sets:
@@ -161,12 +222,12 @@ fields:
 id: preview screen
 continue button field: petition_to_change_name_of_adult_preview_question
 question: |
-  Review your form before you sign it
+  Preview your form before you sign it
 subquestion: |
   Here is a preview of the form you will sign on the next page. 
   
-   ${ al_user_bundle.as_pdf(key='preview') }
-  
+  ${ al_user_bundle.as_pdf(key='preview') }
+    
   Click the image to open it in a new tab. Click the 'Make changes' button to fix any mistakes.
   
   ${ action_button_html(url_action('review_petition_to_change_name_of_adult'), label='Make changes', color='info') } 
@@ -291,13 +352,26 @@ yesno: request_return_of_docs
 ---
 id: What is your new name?
 question: |
-  What is your new name?
+  What name do you want to be called?
 fields:
   - 'New first name': user_name_first_new
   - 'New middle name': user_name_middle_new
     required: False
   - 'New last name': user_name_last_new
   - 'Reason for your name change': user_name_change_reason
+---
+id: new name affirmation
+question: |
+  You are on your way!
+subquestion: |
+  ${ user_name_first_new }, you are one step closer to changing your name
+  on official documents.
+  
+  [CENTER][FILE balloons.svg, 20%, Balloons]
+post: |  
+  Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+  
+continue button field: new_name_affirmation  
 ---
 id: What is the docket number?
 question: |
@@ -312,11 +386,36 @@ fields:
   - no label: attorney_helping
     datatype: yesnoradio
 ---
-id: What is the attorney's BBO number?
+id: name of attorney
+sets:
+  - attorneys[i].name.first
+  - attorneys[i].name.last
+  - attorneys[i].address.address
+  - attorneys[i].address.city
+generic object: ALPeopleList
 question: |
-  What is the attorney's BBO number?
+  Name of your attorney
 fields:
-  - 'Attorney BBO': attorney_bbo
+  - code: |
+      attorneys[i].name_fields()
+  - BBO number: attorney_bbo
+    required: False
+  - code: |
+      attorneys[i].address_fields()
+  - Phone number: attorneys[i].phone_number
+    required: False
+  - Email: attorneys[i].email
+    required: False
+---
+question: |
+  What is your date of birth?
+fields:
+  - 'Date of Birth': users[0].birthdate
+    datatype: BirthDate
+validation code: |
+  if users[0].age_in_years() < 18:
+    validation_error("You need to be 18 or older to use this form.", field='users[0].birthdate')
+    
 ---
 progress: 100
 id: download
@@ -346,8 +445,8 @@ attachment:
   docx template file: petition_to_change_name_of_adult_addendum.docx
 ---
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[petition_to_change_name_of_adult_attachment, cari_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")
-  - al_court_bundle: ALDocumentBundle.using(elements=[petition_to_change_name_of_adult_attachment, cari_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")  
+  - al_user_bundle: ALDocumentBundle.using(elements=[petition_to_change_name_of_adult_attachment, cari_attachment, affidavitofindigency_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")
+  - al_court_bundle: ALDocumentBundle.using(elements=[petition_to_change_name_of_adult_attachment, cari_attachment, affidavitofindigency_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")  
 ---
 code: cari_attachment.enabled = True
 ---
@@ -357,6 +456,9 @@ code: |
   docket_number = DAEmpty()
   cari_reason = "name_change"
   other_names_or_alias = "; ".join([str(name.old_name) for name in past_names])
+---
+code: |
+  affidavitofindigency_attachment.enabled = is_indigent
 ---
 attachment:
     variable name: petition_to_change_name_of_adult_attachment[i]
@@ -422,28 +524,20 @@ attachment:
 id: petition_to_change_name_of_adult review screen
 event: review_petition_to_change_name_of_adult
 question: |
-  Placeholder Review Screen
+  Review Screen
 subquestion: |
   Edit your answers below
 review: 
   - Edit: user_mail_address_street
     button: |
-      Street Address:
+      Mailing Address:
       ${ user_mail_address_street }
-  - Edit: user_mail_address_city
-    button: |
       City:
       ${ user_mail_address_city }
-  - Edit: user_mail_address_street2
-    button: |
       Unit:
       ${ user_mail_address_street2 }
-  - Edit: user_mail_address_zip
-    button: |
       Zip:
       ${ user_mail_address_zip }
-  - Edit: user_mail_address_state
-    button: |
       State:
       ${ user_mail_address_state }
   - Edit: request_return_of_docs
@@ -452,28 +546,24 @@ review:
       ${ word(yesno(request_return_of_docs)) }
   - Edit: user_name_middle_new
     button: |
-      New middle name:
-      ${ user_name_middle_new }
-  - Edit: user_name_first_new
-    button: |
       New first name:
       ${ user_name_first_new }
-  - Edit: user_name_last_new
-    button: |
+      New middle name:
+      ${ user_name_middle_new }
       New last name:
       ${ user_name_last_new }
   - Edit: user_name_change_reason
     button: |
       Why do you want to change your name?:
       ${ user_name_change_reason }
-  - Edit: interpreter_language
+  - Edit: user_preferred_language
     button: |
       Interpreter language:
-      ${ interpreter_language }
-  - Edit: request_interpreter
+      ${ user_preferred_language }
+  - Edit: user_needs_interpreter
     button: |
       Would you like an interpreter?:
-      ${ word(yesno(request_interpreter)) }
+      ${ word(yesno(user_needs_interpreter)) }
   - Edit: attorney_bbo
     button: |
       Attorney BBO:
@@ -484,89 +574,41 @@ review:
       ${ docket_number }
   - Edit: users[0].name.middle
     button: |
-      users[0].name.middle:
-      ${ users[0].name.middle }
-  - Edit: users[0].name.last
-    button: |
-      users[0].name.last:
-      ${ users[0].name.last }
-  - Edit: users[0].name.first
-    button: |
-      users[0].name.first:
-      ${ users[0].name.first }
+      Your current legal name: 
+      ${ users }
   - Edit: users[0].address.address
     button: |
-      users[0].address.address:
-      ${ users[0].address.address }
-  - Edit: users[0].address.unit
-    button: |
-      users[0].address.unit:
-      ${ users[0].address.unit }
-  - Edit: users[0].address.city
-    button: |
-      users[0].address.city:
-      ${ users[0].address.city }
-  - Edit: users[0].address.state
-    button: |
-      users[0].address.state:
-      ${ users[0].address.state }
-  - Edit: users[0].address.zip
-    button: |
-      users[0].address.zip:
-      ${ users[0].address.zip }
+      Your address:  
+      ${ users[0].address.block() }
   - Edit: users[0].phone_number
     button: |
-      users[0].phone_number:
+      Phone number:
       ${ users[0].phone_number }
   - Edit: users[0].email
     button: |
-      users[0].email:
+      Email:
       ${ users[0].email }
-  - Edit: signature_date
-    button: |
-      signature_date:
-      ${ signature_date }
   - Edit: users[0].signature
     button: |
-      users[0].signature:
+      Your signature:
       ${ users[0].signature }
-  - Edit: users[0]
-    button: |
-      users[0]:
-      ${ users[0] }
   - Edit: attorneys[0].signature
     button: |
-      attorneys[0].signature:
+      Signature of attorney:
       ${ attorneys[0].signature }
-  - Edit: attorneys[0]
+  - Edit: attorneys[0].name.first
     button: |
-      attorneys[0]:
+      Name of attorney:
       ${ attorneys[0] }
   - Edit: attorneys[0].address.address
     button: |
-      attorneys[0].address.address:
-      ${ attorneys[0].address.address }
-  - Edit: attorneys[0].address.unit
-    button: |
-      attorneys[0].address.unit:
-      ${ attorneys[0].address.unit }
-  - Edit: attorneys[0].address.state
-    button: |
-      attorneys[0].address.state:
-      ${ attorneys[0].address.state }
-  - Edit: attorneys[0].address.city
-    button: |
-      attorneys[0].address.city:
-      ${ attorneys[0].address.city }
-  - Edit: attorneys[0].address.zip
-    button: |
-      attorneys[0].address.zip:
-      ${ attorneys[0].address.zip }
+      Attorney's address:  
+      ${ attorneys[0].address.block() }
   - Edit: attorneys[0].phone_number
     button: |
-      attorneys[0].phone_number:
+      Attorney's phone number:
       ${ attorneys[0].phone_number }
   - Edit: attorneys[0].email
     button: |
-      attorneys[0].email:
+      Attorney's email:
       ${ attorneys[0].email }
