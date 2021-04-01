@@ -374,6 +374,17 @@ fields:
     required: False
   - 'New last name': user_name_last_new
   - 'Reason for your name change': user_name_change_reason
+help:
+  label: What reason can I list?
+  content: |
+    You need to give a reason for changing your name. You may have personal
+    reasons for changing your name. You do not need to tell the court
+    every reason.
+    
+    For example, you may tell the court that:
+    
+    * It is the name I use.
+    * It is the name that people call me.
 ---
 id: new name affirmation
 question: |
