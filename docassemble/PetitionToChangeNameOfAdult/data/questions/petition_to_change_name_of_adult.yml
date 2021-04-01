@@ -154,7 +154,7 @@ fields:
     datatype: radio
     choices:
       - I am getting married.: married
-      - I am getting divorced and want to use the **same** name I had before my divorce.: divorced
+      - I am getting divorced and want to use the **same** name I had before my marriage.: divorced
       - I am becoming a United States Citizen.: citizen
       - I have another reason for changing my name.: other
   - Are you at least 18?: over_18
