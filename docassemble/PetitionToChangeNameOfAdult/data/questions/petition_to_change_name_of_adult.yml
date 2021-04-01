@@ -60,10 +60,12 @@ objects:
 code: |
   fees['Costs of an expert witness'].waive = False
   fees['Filing fee'].waive = True
-  fees['Filing fee'].amount = 150
-  fees['Other cost'].waive = True
-  fees['Other cost'].amount = 30
-  fees['Other cost'].description = "Surcharge ($15) and fee for citation for publication ($15)."
+  fees['Filing fee'].amount = 165
+  fees['Service'].waive = True
+  fees['Service'].amount = 15
+  fees['Other'].waive = True
+  fees['Other'].amount = 300
+  fees['Other'].description = "Publication"
   case_name = "In the matter of " + users[0].name.full()
   docket_numbers[0] = ''
   set_indigency_defaults = True
@@ -113,7 +115,8 @@ code: |
     attorney_bbo
   interview_order_cari
   set_indigency_defaults
-  ask_affidavit_questions
+  if ask_if_qualifies_for_fee_waiver:
+    ask_affidavit_questions    
   petition_to_change_name_of_adult_preview_question
   basic_questions_signature_flow
   users[0].signature
@@ -151,7 +154,7 @@ fields:
     datatype: radio
     choices:
       - I am getting married.: married
-      - I am getting divorced.: divorced
+      - I am getting divorced and want to use the **same** name I had before my divorce.: divorced
       - I am becoming a United States Citizen.: citizen
       - I have another reason for changing my name.: other
   - Are you at least 18?: over_18
@@ -208,6 +211,18 @@ subquestion: |
   convicted.
 
   You will get more instructions about this later.
+---
+question: |
+  Getting the court to pay your fees
+subquestion: |
+  It costs about $480 to change your name. But you may qualify
+  for a fee waiver. If you do, you will need to tell the court about your income.
+  
+  Do you want to find out?  
+field: ask_if_qualifies_for_fee_waiver
+buttons:  
+  - Find out if I qualify: True
+  - Skip: False
 ---
 id: your name
 sets:
@@ -433,11 +448,15 @@ subquestion: |
   where you were born.
   4. File one of the copies with the court. Keep the other for your records.
   
-  ${ action_button_html(url_action('review_petition_to_change_name_of_adult'), label='Make changes', color='info') } 
+  ${ action_button_html(url_action('review_petition_to_change_name_of_adult'), label='Make changes', color='info', icon='pencil-alt') } 
+  
+  ${ action_button_html(al_user_bundle.as_pdf().url_for(), label="Download a copy as a single PDF", icon='download') }
   
   ${ al_user_bundle.download_list_html() }
   
   ${ al_user_bundle.send_button_html() }
+  
+
 ---
 objects:
   - petition_to_change_name_of_adult_attachment: ALDocument.using(filename="petition_to_change_name_of_adult", title="Petition to Change Name of Adult", enabled=True, has_addendum=True)
@@ -469,7 +488,7 @@ code: |
   other_names_or_alias = "; ".join([str(name.old_name) for name in past_names])
 ---
 code: |
-  affidavitofindigency_attachment.enabled = is_indigent
+  affidavitofindigency_attachment.enabled = ask_if_qualifies_for_fee_waiver and is_indigent
 ---
 attachment:
     variable name: petition_to_change_name_of_adult_attachment[i]
@@ -495,7 +514,7 @@ attachment:
       - "user_email": ${ users[0].email }
       - "signature_date": ${ signature_date }
       # If it is a signature, test which file version we're expecting. leave it empty unless it's the final attachment version
-      - "user_signature": ${ users[0].signature if i == 'final' else '' }
+      # - "user_signature": ${ users[0].signature if i == 'final' else '' }
       - "user_name": ${ str(users[0]) }
       # If it is a signature, test which file version we're expecting. leave it empty unless it's the final attachment version
       - "attorney_signature": ${ attorneys[0].signature if i == 'final' else '' }
