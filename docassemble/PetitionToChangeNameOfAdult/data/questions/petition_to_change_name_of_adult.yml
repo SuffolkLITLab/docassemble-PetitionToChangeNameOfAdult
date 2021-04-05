@@ -4,6 +4,7 @@ include:
   - docassemble.MassAccess:massaccess.yml 
   - docassemble.CARIRequest:cari_release.yml
   - docassemble.ALAffidavitOfIndigency:affidavit_body.yml
+  - motion_to_waive_publication.yml
 ---
 comment: |
   The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
@@ -91,6 +92,8 @@ code: |
   user_name_change_reason  
   users[0].name.first
   new_name_affirmation
+  if ask_waiver_of_publication:
+    affidavit_reviewed
   users[0].address.address
   different_mailing_address
   if not different_mailing_address:
@@ -448,13 +451,13 @@ event: petition_to_change_name_of_adult_download
 question: |
   Your form is ready to download.
 subquestion: |
-  Thank you ${users}. Your form is ready to download and deliver.
+  Thank you ${ user_name_first_new }. Your form is ready to download and deliver.
   
   View, download and send your form below. Click the "Make changes" button to fix any mistakes. 
   
   1. Download each of the documents below. Print at least two copies.
   2. Call the ${ trial_court } at ${ bold(trial_court.phone) } to find out how
-  to deliver these forms.
+  to deliver these forms. You can mail a copy to ${ trial_court.address.on_one_line() }.
   3. Get a **certified** copy of your birth certificate from the town hall
   where you were born.
   4. File one of the copies with the court. Keep the other for your records.
@@ -466,8 +469,6 @@ subquestion: |
   ${ al_user_bundle.download_list_html() }
   
   ${ al_user_bundle.send_button_html() }
-  
-
 ---
 objects:
   - petition_to_change_name_of_adult_attachment: ALDocument.using(filename="petition_to_change_name_of_adult", title="Petition to Change Name of Adult", enabled=True, has_addendum=True)
@@ -486,8 +487,8 @@ attachment:
   docx template file: petition_to_change_name_of_adult_addendum.docx
 ---
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[name_change_next_steps_attachment, petition_to_change_name_of_adult_attachment, cari_attachment, affidavitofindigency_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")
-  - al_court_bundle: ALDocumentBundle.using(elements=[petition_to_change_name_of_adult_attachment, cari_attachment, affidavitofindigency_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")  
+  - al_user_bundle: ALDocumentBundle.using(elements=[name_change_next_steps_attachment, petition_to_change_name_of_adult_attachment, cari_attachment, family_law_motion_attachment, name_change_waiver_affidavit, affidavitofindigency_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")
+  - al_court_bundle: ALDocumentBundle.using(elements=[petition_to_change_name_of_adult_attachment, cari_attachment, family_law_motion_attachment, name_change_waiver_affidavit,  affidavitofindigency_attachment], filename="petition_to_change_name_of_adult.pdf", title="All forms to download for your records")  
 ---
 code: cari_attachment.enabled = True
 ---
@@ -653,3 +654,11 @@ review:
     button: |
       Attorney's email:
       ${ attorneys[0].email }
+---
+id: persons signature
+question: |
+  ${user_name_first_new}, please sign your current legal name below
+signature: users[0].signature
+under: |
+  ${ users[0] }
+progress: 99  

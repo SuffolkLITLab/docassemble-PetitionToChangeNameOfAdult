@@ -1,0 +1,102 @@
+---
+imports:
+  - num2words
+---
+question: |
+  Publication of your new name
+subquestion: |
+  If the judge grants your petition, you may need to "publish" your new
+  name in a local newspaper.
+  
+  If publishing your name is not safe or you have another good reason not to
+  publish your name, you can ask the judge to "waive" publication.
+fields:  
+  - Do you need the judge to waive publication?: ask_waiver_of_publication
+    datatype: yesnoradio
+  - Why do you need the judge to waive publication?: basis_for_motion
+    datatype: area
+    rows: 5
+    maxlength: 910    
+    show if: ask_waiver_of_publication
+  - note: |
+      The information that you type here will be part of your "Motion to Waive
+      Publication."
+    show if: ask_waiver_of_publication      
+help:
+  label: |
+    What should I say?
+  content: |
+    Use your own words to explain to the judge **why** you cannot publish your
+    name. Include specific facts.
+    
+    For example, you may not be able to publish your name because:
+    
+    * Publishing your name change would not be safe.
+    * Publishing your name change would expose you to stalking, harassment or 
+      physical harm.
+    * Publishing your name change would cause harm in some other way, including
+      financial harm or risk.
+
+    Explain to the judge the reason that applies to you. Not being able to afford
+    the publication is usually not a reason. If you cannot afford to publish your 
+    name, the court may pay for the publication.
+---
+question: |
+  Your affidavit 
+subquestion: |
+  Now it is time to write your affidavit that explains why you need to keep
+  your new name private.
+  
+  Write down specific facts that explain why you need to keep your name private.
+  Everything you write must be true as far as you know.
+  
+  This may be the same as what you said on the last screen. Make any changes
+  you need below.
+fields:
+  - no label: affidavit_reviewed
+    datatype: area
+    rows: 5
+    default: ${ basis_for_motion }
+---
+objects:
+  - family_law_motion_attachment: ALDocument.using(filename="motion_to_waive_publication", title="Motion to Waive Publication", has_addendum = False)
+  - name_change_waiver_affidavit: ALDocument.using(filename="affidavit_in_support_of_motion_to_waive_publication", title="Affidavit in Support of Motion to Waive Publication", has_addendum=False)  
+---
+code: |
+  family_law_motion_attachment.enabled = ask_waiver_of_publication
+  name_change_waiver_affidavit.enabled = ask_waiver_of_publication
+---
+code: |
+  waive_publication_request = "That pursuant to M.G.L. C. 210 § 13, and upon the good cause stated below, this court waive the requirement that I publish notice of my name change in the above-captioned action.\n"
+  waive_publication_request += "In support of my motion, I state that: "
+---
+attachment:
+  variable name: name_change_waiver_affidavit[i]
+  docx template file: name_change_waiver_affidavit.docx
+---
+need: 
+  - waive_publication_request
+attachment:
+    variable name: family_law_motion_attachment[i]
+    pdf template file: Generic_Motion_Family_Law_no_certificate_of_service.pdf
+    skip undefined: True 
+    fields: 
+      - "plaintiff": ${ "In re " + str(users) }
+      - "user_name": ${ users }
+      - "signature_date__1": ${ today() }
+      - "user_signature": ${ users[0].signature }
+      - "user_name__2": ${ users }
+      - "user_address_street": ${ users[0].address.line_one() }
+      - "user_address_city": ${ users[0].address.city }
+      - "user_address_state": ${ users[0].address.state }
+      - "user_address_zip": ${ users[0].address.zip }
+      - "user_phone": ${ users[0].phone_numbers() }
+      # - "docket_number__2": ${  }
+      - "signature_date__2": ${ today() }
+      - "court_division": ${ trial_court.division }
+      - "motion_name": ${ "Motion to Waive Publication" }
+      - "user_is_petitioner": ${ True }
+      - "user_request": ${ waive_publication_request + re.sub("(\r|\n)+","\n",basis_for_motion) }
+      - "bbo_number": ${ bbo_number }
+      - "court_division__2": ${ trial_court.division }
+      - "motion_name__2": ${ "Motion to Waive Publication" }
