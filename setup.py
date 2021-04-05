@@ -43,7 +43,7 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
     return out
 
 setup(name='docassemble.PetitionToChangeNameOfAdult',
-      version='2.2.4',
+      version='2.2.5',
       description=(''),
       long_description='This is a form for allowing an adult to change their legal name.',
       long_description_content_type='text/markdown',
@@ -53,7 +53,7 @@ setup(name='docassemble.PetitionToChangeNameOfAdult',
       url='https://docassemble.org',
       packages=find_packages(),
       namespace_packages=['docassemble'],
-      install_requires=[],
+      install_requires=['docassemble.ALAffidavitOfIndigency>=2.0.3', 'docassemble.CARIRequest'],
       zip_safe=False,
       package_data=find_package_data(where='docassemble/PetitionToChangeNameOfAdult/', package='docassemble.PetitionToChangeNameOfAdult'),
      )
