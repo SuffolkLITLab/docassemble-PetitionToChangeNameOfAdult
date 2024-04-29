@@ -6,17 +6,66 @@ include:
   - docassemble.ALAffidavitOfIndigency:affidavit_body.yml
   - motion_to_waive_publication.yml
 ---
-comment: |
-  The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
 metadata:
   title: |
     Petition to Change Name of Adult
   short title: |
     Name Change Petition
+  description: |
+    If you are over 18 and live in Massachusetts, you can use this form to change your name on 
+    official documents.
+
+    The court will ask for the reason for your name change, but "it is the name that I use"
+    is enough reason.
+
+    If your name change is part of affirming your expressed gender identity, you can file a separate
+    request to change your gender markers on official documents. This interview does not help you 
+    make the request to change your gender markers.
+
+    After you finish the interview you need to sign the petition in front of a notary and file it with the court. 
+  can_I_use_this_form: |
+    You need to be 18 to use this form. There is a separate form for people under 18.
+
+    You should not use this interview to change your name if:
+
+    * You are getting married. You can change your name as part of the marriage process.
+    * You are getting divorced and want to use the same name you had before your marriage. You can change your name as part of the divorce process.
+    * You are becoming a United States Citizen. You can change your name as part of the citizenship process.
+  before_you_start: |
+    After you file the document this interview makes, you also need to file a certified copy of your birth certificate and any past orders for a name change. You may want to get those ready.
+
+    This document needs to be signed in front of a notary. You can find a notary at your bank, town hall, or some office services stores, like the UPS store.
+
+    If the judge grants your petition you must publish a notice of your name change in a local newspaper unless you ask for special permission. This interview can help you make the form
+    to get permission to skip publishing your name in a local newspaper.
+  maturity: production
+  estimated_completion_minutes: 30
+  estimated_completion_delta: 10
+  languages:
+    - en
+  help_page_url: "https://www.mass.gov/how-to/legally-change-your-name-as-an-adult"
+  help_page_title: "Legally change your name as an adult"
+  LIST_topics: 
+    - FA-11-01-00-00
+  tags: 
+    - FA-11-01-00-00
+  jurisdiction: NAM-US-US+MA
+  original_form: "https://www.mass.gov/info-details/probate-and-family-court-petition-to-change-name-of-adult-cjp-27"
+  original_form_published_on: 2018-07-20
+  review_date: 2024-04-27
+  form_titles:
+    - Petition to Change Name of Adult
+    - Court Activity Record Information (CARI) Request
+    - Affidavit of Indigency
+    - Motion to Waive Publication
+  form_numbers:
+    - CJP 27 / PFC 0005
+    - CJP 34
+  fees:
+    - Filing fee: 150.00
+  update_notes: |    
+    Note that the CARI and Affidavit of Indigency live in separate repositories.
 ---
-comment: |
-  This section is used by MAVirtualCourts to control how some of the
-  questions work.
 mandatory: True
 code: |
   interview_metadata # make sure we initialize the object
