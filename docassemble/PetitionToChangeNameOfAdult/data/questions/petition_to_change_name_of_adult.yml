@@ -247,6 +247,7 @@ fields:
       - I am currently committed to the Massachusetts Treatment Center as a **sexually dangerous person**.: is_sdp
 ---
 continue button field: warn_name_change_special_circumstances
+id: "special circumstances for people on parole or in state custody"
 question: |
   Special circumstances for people on parole or in state custody
 subquestion: |
@@ -264,6 +265,7 @@ subquestion: |
 
   You will get more instructions about this later.
 ---
+id: "getting the court to pay your fees"
 question: |
   Getting the court to pay your fees
 subquestion: |
@@ -398,7 +400,9 @@ fields:
 id: another name change
 question: |
   Is there another time you changed your name?
-yesno: past_names.there_is_another  
+fields:
+  - no label: past_names.there_is_another
+    datatype: yesnoradio
 ---
 id: nth name change
 question: |
@@ -415,7 +419,9 @@ question: |
 subquestion: |
   If you want, you can ask the court to mail back the certified documents
   you send them, including your birth certificate.
-yesno: request_return_of_docs
+fields:
+  - no label: request_return_of_docs
+    datatype: yesnoradio
 ---
 id: What is your new name?
 question: |
@@ -485,6 +491,7 @@ fields:
   - Email: attorneys[i].email
     required: False
 ---
+id: "what is your date of birth"
 question: |
   What is your date of birth?
 fields:
