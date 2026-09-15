@@ -2,6 +2,7 @@
 imports:
   - num2words
 ---
+id: "publication of your new name"
 question: |
   Publication of your new name
 subquestion: |
@@ -41,6 +42,7 @@ help:
     the publication is usually not a reason. If you cannot afford to publish your 
     name, the court may pay for the publication.
 ---
+id: "your affidavit"
 question: |
   Your affidavit 
 subquestion: |
