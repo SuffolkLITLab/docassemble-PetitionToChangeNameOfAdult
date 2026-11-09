@@ -223,7 +223,7 @@ subquestion: |
   This form helps **adults** change their name. You need to be at least 18
   to use this form.
   
-  [Learn more](https://www.mass.gov/service-details/find-out-who-can-change-their-name).
+  [Learn more about who can change their name](https://www.mass.gov/service-details/find-out-who-can-change-their-name).
   % endif
   % if screen_name_change_reason != "other":
   
@@ -232,7 +232,7 @@ subquestion: |
   You can change your name as part of the marriage, divorce, or citizenship
   process.
   
-  [Learn more](https://www.mass.gov/how-to/legally-change-your-name-as-an-adult).
+  [Learn more about the name change process](https://www.mass.gov/how-to/legally-change-your-name-as-an-adult).
   % endif
 ---
 id: name change special circumstances
